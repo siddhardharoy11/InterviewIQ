@@ -17,22 +17,28 @@ MODEL = "gemini-3.5-flash"
 
 
 def generate_interview_report(
-    resume: str,
-    job_description: str,
-    transcript: str,
+    resume,
+    job_description,
+    transcript,
 
-    role: str,
-    interview_type: str,
-    experience_level: str,
+    interviewer_notes,
+    interviewer_ratings,
 
-    interview_duration: int,
-    questions_answered: int,
-) -> dict:
+    role,
+    interview_type,
+    experience_level,
+
+    interview_duration,
+    questions_answered,
+):
 
     prompt = build_report_prompt(
     resume=resume,
     job_description=job_description,
     transcript=transcript,
+
+    interviewer_notes=interviewer_notes,
+    interviewer_ratings=interviewer_ratings,
 
     role=role,
     interview_type=interview_type,

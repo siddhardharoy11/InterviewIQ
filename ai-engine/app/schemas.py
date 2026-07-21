@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-
+from typing import Optional
 
 class AnalyzeRequest(BaseModel):
     candidateName: str
@@ -59,6 +59,12 @@ class InterviewReport(BaseModel):
 
     communicationAnalysis: CommunicationAnalysis
 
+class InterviewerRatings(BaseModel):
+    technical: Optional[int] = None
+    communication: Optional[int] = None
+    problemSolving: Optional[int] = None
+    behavioral: Optional[int] = None
+    
 class AnalyzeRequest(BaseModel):
     candidateName: str
 
@@ -72,3 +78,7 @@ class AnalyzeRequest(BaseModel):
     resumePath: str
     jobDescriptionPath: str
     audioPath: str
+
+    interviewerNotes: str = ""
+    interviewerRatings: Optional[InterviewerRatings] = None
+

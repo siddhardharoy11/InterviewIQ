@@ -8,6 +8,8 @@ def generate_report(
     resume_path: str,
     jd_path: str,
     audio_path: str,
+    interviewer_notes: str,
+    interviewer_ratings,
 
     role: str,
     interview_type: str,
@@ -38,6 +40,9 @@ def generate_report(
     resume=resume_text,
     job_description=jd_text,
     transcript=transcript,
+
+    interviewer_notes=interviewer_notes,
+    interviewer_ratings=interviewer_ratings,
 
     role=role,
     interview_type=interview_type,
