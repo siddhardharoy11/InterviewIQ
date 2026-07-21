@@ -1,0 +1,14 @@
+import whisper
+
+# Load the model only once
+model = whisper.load_model("base")
+
+
+def transcribe_audio(audio_path: str) -> str:
+    """
+    Transcribes an interview audio file using Whisper.
+    """
+
+    result = model.transcribe(audio_path)
+
+    return result["text"].strip()
