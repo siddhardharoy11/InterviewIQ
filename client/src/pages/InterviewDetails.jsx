@@ -18,6 +18,9 @@ import useFileUpload from "../hooks/useFileUpload";
 
 import useGenerateReport from "../hooks/useGenerateReport";
 
+import ReportCard from "../components/report/ReportCard";
+
+
 export default function InterviewDetails() {
 
     const { id } = useParams();
@@ -144,17 +147,7 @@ export default function InterviewDetails() {
 />
 
 {interview.report && (
-    <div className="lg:col-span-2">
-        <div className="bg-white border rounded-xl p-6">
-            <h2 className="text-2xl font-bold mb-4">
-                AI Report
-            </h2>
-
-            <pre className="text-sm overflow-auto whitespace-pre-wrap">
-                {JSON.stringify(interview.report, null, 2)}
-            </pre>
-        </div>
-    </div>
+    <ReportCard report={interview.report} />
 )}
 
 </div>
