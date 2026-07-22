@@ -18,22 +18,26 @@ export default function useGenerateReport(
 
             setLoading(true);
 
-            await generateAIReport(
-                interviewId
-            );
+            const report = await generateAIReport(interviewId);
+
+            console.log(report);
+
+            return report;
 
             toast.success(
-                "AI analysis started."
-            );
+            "AI report generated successfully."
+        );
 
         }
 
         catch (err) {
 
-            toast.error(
-                "Failed to start analysis."
-            );
+            console.error(err);
 
+            toast.error(
+                err.response?.data?.message ||
+                "Failed to generate report."
+            );
         }
 
         finally {

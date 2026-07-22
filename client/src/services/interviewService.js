@@ -29,7 +29,13 @@ export async function uploadInterviewFile(
     file
 ) {
     const formData = new FormData();
-    formData.append("file", file);
+   const fieldMap = {
+    resume: "resume",
+    "job-description": "jobDescription",
+    audio: "audio",
+};
+
+formData.append(fieldMap[type], file);
 
     const response = await api.post(
         `/interviews/${interviewId}/upload/${type}`,

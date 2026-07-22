@@ -1,7 +1,7 @@
 const Interview = require("../models/Interview");
 const InterviewFile = require("../models/InterviewFile");
 const Report = require("../models/Report");
-const { analyzeInterview } = require("../services/aiService");
+const { generateReport: generateAIReport } = require("../services/aiService");
 
 /* ----------------------------- */
 /* Create Interview              */
@@ -9,12 +9,23 @@ const { analyzeInterview } = require("../services/aiService");
 
 async function createInterview(req, res) {
     try {
-        const { candidateName, candidateEmail } = req.body;
+        const {
+        candidateName,
+        candidateEmail,
+        role,
+        interviewType,
+        experienceLevel,
+        interviewDuration,
+    } = req.body;
 
         const interview = await Interview.create({
-            candidateName,
-            candidateEmail,
-        });
+    candidateName,
+    candidateEmail,
+    role,
+    interviewType,
+    experienceLevel,
+    interviewDuration,
+    }); 
 
         return res.status(201).json({
             success: true,
@@ -71,18 +82,26 @@ async function getInterview(req, res) {
             interview: id,
         });
 
+        const report = await Report.findOne({
+            interview: id,
+        });
+
         return res.json({
             success: true,
             data: {
                 ...interview.toObject(),
+
                 files: {
                     resume: files?.resume || null,
                     jobDescription: files?.jobDescription || null,
                     audio: files?.audio || null,
                     transcript: files?.transcript || null,
                 },
+
+                report: report || null,
             },
         });
+
     } catch (err) {
         return res.status(500).json({
             success: false,
@@ -169,22 +188,10 @@ async function generateReport(req, res) {
             interview: id,
         });
 
-        if (!files) {
+        if (!files || !files.resume) {
             return res.status(400).json({
                 success: false,
-                message: "Upload all required files first.",
-            });
-        }
-
-        if (
-            !files.resume ||
-            !files.jobDescription ||
-            !files.audio
-        ) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Resume, Job Description and Audio are required before analysis.",
+                message: "Resume must be uploaded first.",
             });
         }
 
@@ -200,19 +207,64 @@ async function generateReport(req, res) {
 
         report.status = "PROCESSING";
         await report.save();
+console.log("Interview:", interview);
 
-        // Fire-and-forget AI request
-        analyzeInterview({
-            resumePath: files.resume,
-            jobDescriptionPath: files.jobDescription,
-            audioPath: files.audio,
-        }).catch(console.error);
+console.log("Files:", files);
+
+console.log({
+    candidateName: interview.candidateName,
+    role: interview.role,
+    interviewType: interview.interviewType,
+    experienceLevel: interview.experienceLevel,
+
+    interviewDuration: interview.interviewDuration,
+    questionsAnswered: interview.questionsAnswered,
+
+    resumePath: files.resume,
+    jobDescriptionPath: files.jobDescription || "",
+    audioPath: files.audio || "",
+
+    interviewerNotes: interview.interviewerNotes,
+    interviewerRatings: interview.interviewerRatings,
+});
+    const aiReport = await generateAIReport({
+        candidateName: interview.candidateName,
+
+        role: interview.role,
+        interviewType: interview.interviewType,
+        experienceLevel: interview.experienceLevel,
+
+        interviewDuration: interview.interviewDuration,
+        questionsAnswered: interview.questionsAnswered,
+
+        resumePath: files.resume,
+        jobDescriptionPath: files.jobDescription || "",
+        audioPath: files.audio || "",
+
+        interviewerNotes: interview.interviewerNotes || "",
+        interviewerRatings: interview.interviewerRatings || {},
+    });
+
+        report.status = "COMPLETED";
+
+        Object.assign(report, aiReport);
+
+        await report.save();
 
         return res.json({
             success: true,
-            message: "AI analysis started.",
+            data: report,
         });
+
     } catch (err) {
+
+        console.error(err);
+
+        await Report.findOneAndUpdate(
+            { interview: req.params.id },
+            { status: "FAILED" }
+        );
+
         return res.status(500).json({
             success: false,
             message: err.message,

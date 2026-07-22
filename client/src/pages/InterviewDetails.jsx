@@ -33,6 +33,8 @@ export default function InterviewDetails() {
         reload
 
     } = useInterview(id);
+    console.log("Interview:", interview);
+    console.log("Report:", interview?.report);
 
     const resumeUpload =
         useFileUpload(id, "resume", reload);
@@ -44,6 +46,12 @@ export default function InterviewDetails() {
         useFileUpload(id, "audio", reload);
 
     const generate = useGenerateReport(id);
+
+    const handleGenerate = async () => {
+        await generate.generate();
+
+        await reload();
+    };
 
     if (loading) {
 
@@ -130,10 +138,24 @@ export default function InterviewDetails() {
         onFileSelect={audioUpload.upload}
     />
 
-    <ActionPanel
-        loading={generate.loading}
-        onGenerate={generate.generate}
-    />
+<ActionPanel
+    loading={generate.loading}
+    onGenerate={handleGenerate}
+/>
+
+{interview.report && (
+    <div className="lg:col-span-2">
+        <div className="bg-white border rounded-xl p-6">
+            <h2 className="text-2xl font-bold mb-4">
+                AI Report
+            </h2>
+
+            <pre className="text-sm overflow-auto whitespace-pre-wrap">
+                {JSON.stringify(interview.report, null, 2)}
+            </pre>
+        </div>
+    </div>
+)}
 
 </div>
 

@@ -14,6 +14,7 @@ client = genai.Client(
 )
 
 MODEL = "gemini-3.5-flash"
+# MODEL = "gemini-2.5-flash"
 
 
 def generate_interview_report(
