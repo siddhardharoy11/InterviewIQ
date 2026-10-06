@@ -2,12 +2,14 @@ const { createUploader } = require("../config/multer");
 
 const uploadResume = createUploader(
     "uploads/resumes",
-    ["application/pdf"]
+    ["application/pdf"],
+    "resume"
 );
 
 const uploadJobDescription = createUploader(
     "uploads/job-descriptions",
-    ["application/pdf"]
+    ["application/pdf"],
+    "jobDescription"
 );
 
 const uploadAudio = createUploader(
@@ -19,11 +21,12 @@ const uploadAudio = createUploader(
         "audio/mp4",
         "audio/x-m4a",
         "audio/webm"
-    ]
+    ],
+    "audio"
 );
 
 module.exports = {
     uploadResume,
     uploadJobDescription,
-    uploadAudio,
+    uploadAudio
 };
